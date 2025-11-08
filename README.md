@@ -1,1 +1,1 @@
-# Micro para Gestão de Colaboradores nos Projetos
+# Microsserviço para Gestão de Colaboradores nos Projetos
