@@ -1,21 +1,29 @@
 from database.connection import get_connection
 
+
+
+
 # ============================================================
-# 🔹 COLABORADORES
+# 🔹 Consultas por status
 # ============================================================
 
-def listar_colaboradores():
+def listar_colaboradores_por_status(id_projeto: int, status: str):
     conexao = get_connection()
     cursor = conexao.cursor()
     cursor.execute("""
-        SELECT id, nome, telefone, cidade, estado, tecnologias
-        FROM colaboradores
-    """)
+        SELECT cp.id_colaborador, cp.status
+        FROM colaborador_projeto cp
+        WHERE cp.id_projeto = ? AND cp.status = ?
+    """, (id_projeto, status))
     colunas = [desc[0] for desc in cursor.description]
     dados = [dict(zip(colunas, linha)) for linha in cursor.fetchall()]
     conexao.close()
     return dados
 
+
+# ============================================================
+# 🔹 COLABORADORES
+# ============================================================
 
 def buscar_colaborador_por_id(id_colaborador: int):
     conexao = get_connection()
@@ -36,34 +44,6 @@ def buscar_colaborador_por_id(id_colaborador: int):
 # ============================================================
 # 🔹 COLABORADOR_PROJETO
 # ============================================================
-
-def listar_colaboradores_projetos():
-    conexao = get_connection()
-    cursor = conexao.cursor()
-    cursor.execute("""
-        SELECT id_projeto, id_colaborador, status
-        FROM colaborador_projeto
-    """)
-    colunas = [desc[0] for desc in cursor.description]
-    dados = [dict(zip(colunas, linha)) for linha in cursor.fetchall()]
-    conexao.close()
-    return dados
-
-
-def listar_por_projeto(id_projeto: int):
-    conexao = get_connection()
-    cursor = conexao.cursor()
-    cursor.execute("""
-        SELECT cp.id_colaborador, c.nome, c.tecnologias, cp.status
-        FROM colaborador_projeto cp
-        JOIN colaboradores c ON cp.id_colaborador = c.id
-        WHERE cp.id_projeto = ?
-    """, (id_projeto,))
-    colunas = [desc[0] for desc in cursor.description]
-    dados = [dict(zip(colunas, linha)) for linha in cursor.fetchall()]
-    conexao.close()
-    return dados
-
 
 def atualizar_status(id_projeto: int, id_colaborador: int, novo_status: str):
     conexao = get_connection()
