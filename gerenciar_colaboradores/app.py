@@ -92,21 +92,38 @@ def buscar_colaborador(id_colaborador: int):
 # 🔹 COLABORADOR ↔ PROJETO
 # ============================================================
 
-@router.get("/colaborador_projeto")
-def listar_todos():
-    """Lista todos os vínculos entre colaboradores e projetos."""
-    relacoes = dao.listar_colaboradores_projetos()
-    if not relacoes:
-        raise HTTPException(status_code=404, detail="Nenhum vínculo encontrado")
-    return {"colaborador_projeto": relacoes}
-
-
-@router.get("/colaborador_projeto/projeto/{id_projeto}")
-def listar_por_projeto(id_projeto: int):
-    relacoes = dao.listar_por_projeto(id_projeto)
+@router.get("/colaborador_projeto/colaborando/{id_projeto}")
+def listar_colaborando(id_projeto: int):
+    status = "Colaborando"
+    relacoes = dao.listar_colaboradores_por_status(id_projeto, status)
+    
     if not relacoes:
         raise HTTPException(status_code=404, detail="Nenhum colaborador vinculado a este projeto")
-    return {"colaboradores": relacoes}
+    
+    colaboradores = []
+    for relacao in relacoes:
+        col = dao.buscar_colaborador_por_id(relacao["id_colaborador"])
+        if col:  # só adiciona se o colaborador existir
+            colaboradores.append(col)
+    
+    return {"colaboradores": colaboradores}
+
+
+@router.get("/colaborador_projeto/solicitado/{id_projeto}")
+def listar_colaborando(id_projeto: int):
+    status = "Solicitado"
+    relacoes = dao.listar_colaboradores_por_status(id_projeto, status)
+    
+    if not relacoes:
+        raise HTTPException(status_code=404, detail="Nenhum colaborador vinculado a este projeto")
+    
+    colaboradores = []
+    for relacao in relacoes:
+        col = dao.buscar_colaborador_por_id(relacao["id_colaborador"])
+        if col:  # só adiciona se o colaborador existir
+            colaboradores.append(col)
+    
+    return {"colaboradores": colaboradores}
 
 
 @router.put("/colaborador_projeto/{id_projeto}/{id_colaborador}")
