@@ -18,6 +18,53 @@ class CriarRelacao(BaseModel):
     id_colaborador: int
     status: str = "Solicitado"
 
+class CriarColaborador(BaseModel):
+    nome: str
+    telefone: str | None = None
+    descricao: str | None = None
+    cidade: str | None = None
+    estado: str | None = None
+    horas_disponiveis: int | None = None
+    tecnologias: str | None = None
+    interesses: str | None = None
+    portfolio: str | None = None
+
+
+class CriarRelacao(BaseModel):
+    id_projeto: int
+    id_colaborador: int
+    status: str = "Solicitado"
+
+
+# ============================================================
+# 🔹 ENDPOINTS DE CRIAÇÃO
+# ============================================================
+
+@router.post("/colaboradores")
+def criar_colaborador(dados: CriarColaborador):
+    """Cria um novo colaborador."""
+    colaborador_id = dao.criar_colaborador(dados)
+    if not colaborador_id:
+        raise HTTPException(status_code=500, detail="Erro ao criar colaborador")
+    return {"mensagem": "Colaborador criado com sucesso!", "id_colaborador": colaborador_id}
+
+
+@router.post("/colaborador_projeto/{id_projeto}/{id_colaborador}")
+def criar_relacao(id_projeto: int, id_colaborador: int, status: str = "Solicitado"):
+    status = "Solicitado"
+    sucesso = dao.criar_relacao(id_projeto, id_colaborador, status)
+    if not sucesso:
+        raise HTTPException(status_code=400, detail="Não foi possível criar a relação. Verifique IDs.")
+    return {"mensagem": "Relação criada com sucesso!"}
+
+
+
+
+
+
+
+
+
 
 # ============================================================
 # 🔹 COLABORADORES
