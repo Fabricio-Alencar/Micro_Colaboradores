@@ -90,3 +90,57 @@ def deletar_relacao(id_projeto: int, id_colaborador: int):
     apagados = cursor.rowcount
     conexao.close()
     return apagados > 0
+
+
+
+
+
+
+
+
+
+
+# ============================================================
+# 🔹 Criar colaborador
+# ============================================================
+
+def criar_colaborador(dados):
+    conexao = get_connection()
+    cursor = conexao.cursor()
+    cursor.execute("""
+        INSERT INTO colaboradores 
+        (nome, telefone, descricao, cidade, estado, horas_disponiveis, tecnologias, interesses, portfolio)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        dados.nome, dados.telefone, dados.descricao, dados.cidade, dados.estado,
+        dados.horas_disponiveis, dados.tecnologias, dados.interesses, dados.portfolio
+    ))
+    conexao.commit()
+    novo_id = cursor.lastrowid
+    conexao.close()
+    return novo_id
+
+
+# 🔹 Criar relação colaborador ↔ projeto
+def criar_relacao(id_projeto: int, id_colaborador: int, status: str = "Solicitado"):
+    conexao = get_connection()
+    cursor = conexao.cursor()
+
+    # Verifica se o colaborador existe
+    cursor.execute("SELECT id FROM colaboradores WHERE id = ?", (id_colaborador,))
+    if not cursor.fetchone():
+        conexao.close()
+        return False
+
+    # Insere a relação
+    try:
+        cursor.execute("""
+            INSERT INTO colaborador_projeto (id_projeto, id_colaborador, status)
+            VALUES (?, ?, ?)
+        """, (id_projeto, id_colaborador, status))
+        conexao.commit()
+        return True
+    except:
+        return False
+    finally:
+        conexao.close()
